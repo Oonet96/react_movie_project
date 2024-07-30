@@ -83,9 +83,9 @@ function Home(){
                         <MovieInfoListBox key={item.id} movieData={item}/>
                     )) : console.log('error!')}
                 </ul>
-                <div>
+                <div id='page_list_button_container'>
                     <img src={left_btn} width={20} height={40} onClick={e=>onClickMovePageList(true)}/>
-                    <ul>
+                    <ul id='page_list_button_box'>
                         {/* {listBtn} */}
                         {setPageNumberButton()}
                     </ul>

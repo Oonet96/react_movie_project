@@ -1,3 +1,15 @@
 ul,li{
     list-style: none;
 }
+
+#page_list_button_container{
+    display: flex;
+    justify-content:center;
+}
+
+#page_list_button_container #page_list_button_box{
+    padding-right: 40px;
+    display: flex;
+    justify-content:center;
+
+}
