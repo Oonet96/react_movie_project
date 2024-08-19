@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import {Routes, Route, Link } from "react-router-dom";
 import axios from "axios";
 import './Home.css';
+import Loading from "./Loading";
 import MovieInfoListBox from "../components/MovieInfoListBox";
 import MovieDataList from "../data/MovieData";
 import left_btn from '../images/ic_left_btn.png';
@@ -38,16 +39,20 @@ function Home(){
 
     useEffect(
         ()=>{
+            setLoaded(false);
+            pageUp();
             fetchMoviesData();
-
         },
     [curPageNumber]);
 
     async function fetchMoviesData(){
-        const res = await axios.get(`https://yts-proxy.now.sh/list_movies.json?sort_by=rating&page=${curPageNumber}`);
-        MovieCount=res.data.data.movie_count;
-        setDataList(new MovieDataList(res.data.data));
-        setLoaded(true);
+        axios.get(`https://yts-proxy.now.sh/list_movies.json?sort_by=rating&page=${curPageNumber}`)
+            .then(res=>{
+                MovieCount=res.data.data.movie_count;
+                setDataList(new MovieDataList(res.data.data));
+                setLoaded(true);
+            })
+            .catch(error=>console.log(error));
     }
 
     function setPageNumberButton(){
@@ -59,14 +64,23 @@ function Home(){
         return lstButton;
     }
 
+    function pageUp(){
+        window.scrollTo(0, 0);
+    }
+
     function onClickMovePage(e){
-        if(e.target.id !== curPageNumber)
+        if(e.target.id !== curPageNumber){
+            // setLoaded(false);
+            // pageUp();
             setPageNumber(e.target.id);
+        }
     }
 
     function onClickMovePageList(bDirection){
         console.log("onClickMovePageList");
         console.log(curListNumber);
+        // setLoaded(false);
+        // pageUp();
         bDirection ? setListNumber(curListNumber>1 ? curListNumber-1 : 1) : setListNumber(parseInt(MovieCount/2000)>curListNumber ? curListNumber+1 : curListNumber);
         setPageNumberButton();
     }
@@ -81,18 +95,19 @@ function Home(){
                     {movieDataList ?
                     movieDataList.lstMovieData.map(item=>(
                         <MovieInfoListBox key={item.id} movieData={item}/>
-                    )) : console.log('error!')}
+                    )) : console.log('movieDataList is Null!')}
                 </ul>
-                <div id='page_list_button_container'>
-                    <img src={left_btn} width={20} height={40} onClick={e=>onClickMovePageList(true)}/>
-                    <ul id='page_list_button_box'>
-                        {/* {listBtn} */}
-                        {setPageNumberButton()}
-                    </ul>
-                    {parseInt(MovieCount/2000)>curListNumber && <img src={rigth_btn} width={20} height={40} onClick={e=>onClickMovePageList(false)}/>}
-                </div>
             </div>
-            : <p>loading...</p>}
+            : <Loading/>}
+
+        <div id='page_list_button_container'>
+            <img src={left_btn} width={20} height={40} onClick={e=>onClickMovePageList(true)}/>
+            <ul id='page_list_button_box'>
+                {/* {listBtn} */}
+                {setPageNumberButton()}
+            </ul>
+            {parseInt(MovieCount/2000)>curListNumber && <img src={rigth_btn} width={20} height={40} onClick={e=>onClickMovePageList(false)}/>}
+        </div>
        </>
     );
 }
